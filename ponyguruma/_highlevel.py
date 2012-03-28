@@ -545,16 +545,20 @@ _special_escapes = {
 }
 
 
+from string import letters
+from string import digits
+
 def escape(pattern):
     """Escape all non-alphanumeric characters in pattern."""
-    s = list(pattern)
-    for i, c in enumerate(s):
-        if not ('a' <= c <= 'z' or 'A' <= c <= 'Z' or '0' <= c <= '9'):
-            if c in _special_escapes:
-                s[i] = _special_escapes[c]
-            else:
-                s[i] = '\\' + c
-    return type(pattern)().join(s)
+    def translate(c):
+        """Translates a character to its escaped form"""
+        if not (c in letters or c in digits):
+            try:
+                return _special_escapes[c]
+            except KeyError:
+                return '\\' + c
+        return c
+    return type(pattern)().join([translate(c) for c in list(pattern)])
 
 
 ALL_OBJECTS = ['Regexp', 'Scanner', 'Match', 'RegexpError',
